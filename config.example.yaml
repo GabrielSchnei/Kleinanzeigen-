@@ -1,0 +1,71 @@
+# PS5-Deal-Scanner – Konfiguration
+# Kopieren nach config.yaml und anpassen. Alles, was du weglässt, nutzt den Standardwert.
+
+scan:
+  interval_seconds: 20        # Wie oft alle Suchen abgefragt werden (schneller = früher dran, aber Sperr-Risiko)
+  jitter_seconds: 5           # Zufällige Abweichung, wirkt weniger wie ein Bot
+  max_age_minutes: 45         # Ältere Inserate ignorieren (außer bei Preissenkung)
+  notify_on_first_run: false  # Beim allerersten Start nicht alle vorhandenen Inserate melden
+  # Eigene Suchen: einfach auf kleinanzeigen.de suchen/filtern und die URL hier eintragen.
+  # Tipp: Mit PLZ + Umkreis (z.B. 50 km) findest du Deals zum Abholen in deiner Nähe.
+  queries:
+    - name: ps5
+      url: https://www.kleinanzeigen.de/s-konsolen/playstation/anzeige:angebote/ps5/k0c279+konsolen.art_s:playstation
+    - name: playstation 5
+      url: https://www.kleinanzeigen.de/s-konsolen/playstation/anzeige:angebote/playstation-5/k0c279+konsolen.art_s:playstation
+    - name: defekt
+      url: https://www.kleinanzeigen.de/s-konsolen/playstation/anzeige:angebote/ps5/k0c279+konsolen.art_s:playstation+global.zustand:defect
+    - name: ps5 defekt (alle Kategorien)
+      url: https://www.kleinanzeigen.de/s-anzeige:angebote/ps5-defekt/k0
+
+quiet_hours:
+  timezone: Europe/Berlin
+  active_from: "06:00"        # Ab hier kommen Meldungen
+  active_until: "23:00"       # Ab hier ist Ruhe
+  night_digest: true          # Um 6 Uhr: beste Nacht-Deals, die noch online sind
+  digest_max: 5
+
+deal:
+  min_profit: 60              # Mindestgewinn in € nach Teilen und Nebenkosten
+  min_price: 40
+  max_price: 1100
+  selling_overhead: 15        # Versand/Fahrt/Gebühren pro Deal
+  instant_score: 80           # Ab diesem Score sofort melden, KI-Urteil wird nachgereicht
+  candidate_score: 40         # Ab diesem Score prüft die KI
+  exclude_pro_sellers: true   # Gewerbliche Shops ignorieren
+  dynamic_market: true        # Wiederverkaufswerte aus aktuellen Inseraten lernen
+  # Wiederverkaufswerte (funktionsfähig, gebraucht, 1 Controller) – Startwerte
+  resale:
+    disc: 430
+    digital: 380
+    slim_disc: 430
+    slim_digital: 380
+    pro: 1000
+  # Reparaturen: [Teilekosten €, Schwierigkeit, kann ich selbst (true/false)]
+  repair:
+    software: [0, leicht, true]
+    thermal: [15, leicht, true]
+    fan: [20, leicht, true]
+    hdmi: [12, mittel, true]
+    psu: [45, mittel, true]
+    usb: [8, mittel, true]
+    drive: [45, mittel, false]
+    unknown_defect: [40, mittel, false]
+
+ai:
+  enabled: true               # braucht ANTHROPIC_API_KEY in .env
+  model: claude-opus-5-5      # günstiger & schneller: claude-haiku-5-5
+  effort: low                 # low = schnell; medium/high = gründlicher, langsamer, teurer
+  use_images: true            # Bilder mitschicken (erkennt Schäden, Stockfotos)
+  max_images: 3
+
+messenger:
+  enabled: false              # true, nachdem `python -m ps5_scanner login` ausgeführt wurde
+  headless: true
+  storage_state: data/kleinanzeigen_state.json
+  contact_name: ""            # Profilname, falls Kleinanzeigen danach fragt
+  signature: "Viele Grüße"    # wird an KI-Entwürfe angehängt
+  max_per_hour: 15            # Schutz vor Spam-Sperre
+
+db_path: data/scanner.db
+log_level: INFO

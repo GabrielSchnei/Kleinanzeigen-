@@ -1,0 +1,11 @@
+services:
+  scanner:
+    build:
+      context: .
+      args:
+        WITH_BROWSER: "0"   # auf "1" setzen, wenn der Messenger auf dem Server laufen soll
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./data:/app/data
